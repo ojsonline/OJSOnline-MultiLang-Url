@@ -8,7 +8,7 @@ class MlurlPlugin extends GenericPlugin {
       HookRegistry::register('LoadHandler', array($this, 'handleLocales'));
       // filters
       HookRegistry::register('TemplateManager::display', array($this, 'handleTemplateDisplay'));
-      // user changing url
+      // redirect
       HookRegistry::register('Request::redirect', array($this, 'redirectLocaleUrl'));
     }
     $this->_registerTemplateResource();
@@ -49,21 +49,24 @@ class MlurlPlugin extends GenericPlugin {
     if($this->getEnabled()) {
       if(in_array($page, $urlLocales)) {
           $request = Application::getRequest();
+
           // flip page and op
-          if($op != 'index') {
-            $page = $op;
+          $url_parts = array_filter(explode("/", parse_url($request->getCompleteUrl())['path']));
+          if(in_array('index.php', $url_parts)) {
+            $key = array_search('index.php', $url_parts);
+            unset($url_parts[$key]);
           }
-          // index or arguments in url
-          if($page == 'index') {
-            $op = 'index';
+          $url_parts = array_values($url_parts);
+          if(isset($url_parts[2])) {
+            $page = $url_parts[2];
+          }
+          if(isset($url_parts[3])) {
+            $op = $url_parts[3];
           } else {
-            $op = basename($request->getCompleteUrl());
+            $op = 'index';
           }
           // some pages can have other path
           $page = $this->pageFilter($page);
-          if($page == $op) {
-            $op = 'index';
-          }
           // rewrite locale in session
           $session = $request->getSession();
           $currentLocale = $session->getSessionVar('currentLocale');
@@ -71,11 +74,17 @@ class MlurlPlugin extends GenericPlugin {
             $session->setSessionVar('currentLocale', $pageLocale);
             $request->redirectUrl($request->getCompleteUrl());
           }
-          if(is_file("pages/{$page}/index.php")) {
-            require_once("pages/{$page}/index.php");
-          } else {
-            require_once("pages/{$op}/index.php");
+          switch($page) {
+            case 'article': require_once(__DIR__ . "/pages/article/index.php");
+            break;
+            default:  if(is_file("pages/{$page}/index.php")) {
+                        require_once("pages/{$page}/index.php");
+                      } else {
+                        require_once("pages/{$op}/index.php");
+                      }
+            break;
           }
+
           return true;
       }
     }
@@ -102,10 +111,15 @@ class MlurlPlugin extends GenericPlugin {
       $href = $pqLink->attr('href');
       if(strpos($href, '/' . $currentLocale . '/') === false
          && strpos($href, 'setLocale') === false
-         && strpos($href, 'submissions') === false
-         && strpos($href, 'user/profile') === false
-         && strpos($href, 'admin/index') === false
-         && strpos($href, 'login/signOut') === false
+         && strpos($href, $baseUrl . '/admin') === false
+         && strpos($href, $baseUrl . '/submission') === false
+         && strpos($href, $baseUrl . '/submissions') === false
+         && strpos($href, $baseUrl . '/login') === false
+         && strpos($href, $baseUrl . '/user') === false
+         && strpos($href, $baseUrl . '/management') === false
+         && strpos($href, $baseUrl . '/stats') === false
+         && strpos($href, $baseUrl . '/manageIssues') === false
+         && strpos($href, $baseUrl . '/$$$call$$$') === false
        ) {
           $pqLink->attr('href', str_replace($baseUrl . "/", $baseUrl . "/" . $currentLocale . '/', $href));
       }
@@ -188,12 +202,8 @@ class MlurlPlugin extends GenericPlugin {
     return $page;
   }
 
-  function handlerFilter($handler) {
-    switch(strtolower($handler)) {
-      case 'submissions' : $handler = 'Submission';
-      break;
-    }
-    return $handler;
+  function opFilter($page, $op) {
+
   }
 
 }
