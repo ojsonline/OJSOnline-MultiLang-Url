@@ -77,6 +77,8 @@ class MlurlPlugin extends GenericPlugin {
           switch($page) {
             case 'article': require_once(__DIR__ . "/pages/article/index.php");
             break;
+            case 'issue': require_once(__DIR__ . "/pages/issue/index.php");
+            break;
             default:  if(is_file("pages/{$page}/index.php")) {
                         require_once("pages/{$page}/index.php");
                       } else {
@@ -121,7 +123,12 @@ class MlurlPlugin extends GenericPlugin {
          && strpos($href, $baseUrl . '/manageIssues') === false
          && strpos($href, $baseUrl . '/$$$call$$$') === false
        ) {
-          $pqLink->attr('href', str_replace($baseUrl . "/", $baseUrl . "/" . $currentLocale . '/', $href));
+              $pqLink->attr('href', str_replace($baseUrl . "/", $baseUrl . "/" . $currentLocale . '/', $href));
+      } else {
+        // issue fix
+        if(strpos($currentUrl, 'issue') !== false && strpos($href, 'issue') === false && strpos($href, 'view') !== false) {
+            $pqLink->attr('href', str_replace($baseUrl . "/" . $currentLocale, $baseUrl . "/" . $currentLocale . "/issue", $href));
+        }
       }
       continue;
     }
