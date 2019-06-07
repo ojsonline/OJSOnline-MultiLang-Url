@@ -8,8 +8,6 @@ class MlurlPlugin extends GenericPlugin {
       HookRegistry::register('LoadHandler', array($this, 'handleLocales'));
       // filters
       HookRegistry::register('TemplateManager::display', array($this, 'handleTemplateDisplay'));
-      // fix article download
-      HookRegistry::register('ArticleHandler::view::galley', array($this, 'fixDownloadGalley'));
       // redirect
       HookRegistry::register('Request::redirect', array($this, 'redirectLocaleUrl'));
     }
@@ -27,12 +25,6 @@ class MlurlPlugin extends GenericPlugin {
 
   function getHandlerPath() {
     return $this->getPluginPath() . DIRECTORY_SEPARATOR . 'pages';
-  }
-
-  function fixDownloadGalley($hookName, $args) {
-    /*$request =& $args[0];
-    var_dump($args[2]);
-    return false;*/
   }
 
   function handleTemplateDisplay($hookName, $args) {
