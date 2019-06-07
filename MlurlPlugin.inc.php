@@ -8,6 +8,8 @@ class MlurlPlugin extends GenericPlugin {
       HookRegistry::register('LoadHandler', array($this, 'handleLocales'));
       // filters
       HookRegistry::register('TemplateManager::display', array($this, 'handleTemplateDisplay'));
+      // fix article download
+      HookRegistry::register('ArticleHandler::view::galley', array($this, 'fixDownloadGalley'));
       // redirect
       HookRegistry::register('Request::redirect', array($this, 'redirectLocaleUrl'));
     }
@@ -25,6 +27,12 @@ class MlurlPlugin extends GenericPlugin {
 
   function getHandlerPath() {
     return $this->getPluginPath() . DIRECTORY_SEPARATOR . 'pages';
+  }
+
+  function fixDownloadGalley($hookName, $args) {
+    /*$request =& $args[0];
+    var_dump($args[2]);
+    return false;*/
   }
 
   function handleTemplateDisplay($hookName, $args) {
@@ -75,7 +83,9 @@ class MlurlPlugin extends GenericPlugin {
             $request->redirectUrl($request->getCompleteUrl());
           }
           switch($page) {
-            case 'article': require_once(__DIR__ . "/pages/article/index.php");
+            case 'article':
+            case 'download':
+              require_once(__DIR__ . "/pages/article/index.php");
             break;
             case 'issue': require_once(__DIR__ . "/pages/issue/index.php");
             break;
@@ -141,11 +151,13 @@ class MlurlPlugin extends GenericPlugin {
     $url =& $args[0];
     $request = Application::getRequest();
     $path = parse_url($request->getCompleteUrl())['path'];
+    // locale variable in session
+    $session = $request->getSession();
+    $currentLocale = $session->getSessionVar('currentLocale');
+    $base = basename($path);
+    $localePartUrl = self::convertLocale($base);
+    // language switching
     if(strpos($path, 'setLocale') !== false) {
-      $session = $request->getSession();
-      $currentLocale = $session->getSessionVar('currentLocale');
-      $base = basename($path);
-      $localePartUrl = self::convertLocale($base);
       // if index.php
       $replacePartUrl = explode("/", trim($_GET['source'],"/"))[2];
       $url = str_replace('/' . $replacePartUrl . '/', '/' . $localePartUrl . '/', $url);
@@ -153,6 +165,10 @@ class MlurlPlugin extends GenericPlugin {
       if(substr($url, -1) != '/') {
         $url .= '/';
       }
+    }
+    // download articles
+    if(strpos($url, 'download') !== false && strpos($path, 'article') !== false) {
+      $url = str_replace("/download/", "/article/download/", $url);
     }
     return false;
   }

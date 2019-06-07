@@ -16,7 +16,6 @@ class MlurlIssueHandler extends IssueHandler {
     $request->getRouter()->_page = 'issue';
     $request->getRouter()->_op = 'view';
     $request->getRouter()->getHandler()->_authorizationDecisionManager->_authorizedContext[ASSOC_TYPE_ISSUE] = $issue;
-    //$authorizationManager =& $request->_authorizationDecisionManager;
     parent::view($args, $request);
   }
 }

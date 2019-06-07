@@ -15,6 +15,12 @@ class MlurlArticleHandler extends ArticleHandler {
   function download($args, $request) {
     unset($args[0]);
     $args = array_values($args);
+    $galleys = $this->article->getGalleys();
+    foreach($galleys as $galley) {
+      if(isset($args[1]) && $galley->getId() == $args[1]) {
+        $this->galley = $galley;
+      }
+    }
     parent::download($args, $request);
   }
   function viewFile($args, $request) {
