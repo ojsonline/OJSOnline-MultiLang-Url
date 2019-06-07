@@ -170,6 +170,11 @@ class MlurlPlugin extends GenericPlugin {
     if(strpos($url, 'download') !== false && strpos($path, 'article') !== false) {
       $url = str_replace("/download/", "/article/download/", $url);
     }
+    // current issue redirect
+    if(strpos($path, 'issue/current') !== false) {
+      $replacePartUrl = explode("/", trim($path,"/"))[2];
+      $url = str_replace("/issue", "/" . $replacePartUrl . "/issue", $url);
+    }
     return false;
   }
 
