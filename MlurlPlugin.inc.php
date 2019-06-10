@@ -104,8 +104,10 @@ class MlurlPlugin extends GenericPlugin {
     $journalPath = $request->getRequestedJournalPath();
     $currentUrl = $request->getCompleteUrl();
     $baseUrl = $request->getIndexUrl() . "/" . $journalPath;
+    $indexUrl = $request->getIndexUrl() . "/index";
     $session = $request->getSession();
     $currentLocale = self::convertLocale($session->getSessionVar('currentLocale'));
+    if(!$currentLocale) $currentLocale = self::convertLocale(AppLocale::getPrimaryLocale());
     $document = phpQuery::newDocument($output);
 
     $lang_links = $document->find("a");
@@ -125,13 +127,15 @@ class MlurlPlugin extends GenericPlugin {
          && strpos($href, $baseUrl . '/manageIssues') === false
          && strpos($href, $baseUrl . '/$$$call$$$') === false
        ) {
-              $pqLink->attr('href', str_replace($baseUrl . "/", $baseUrl . "/" . $currentLocale . '/', $href));
+              $pqLink->attr('href', str_replace(array($baseUrl . "/", $indexUrl), $baseUrl . "/" . $currentLocale . '/', $href));
       } else {
         // issue fix
         if(strpos($currentUrl, 'issue') !== false && strpos($href, 'issue') === false && strpos($href, 'view') !== false) {
             $pqLink->attr('href', str_replace($baseUrl . "/" . $currentLocale, $baseUrl . "/" . $currentLocale . "/issue", $href));
         }
       }
+      // home link fix
+
       continue;
     }
 
@@ -149,7 +153,7 @@ class MlurlPlugin extends GenericPlugin {
     $base = basename($path);
     $localePartUrl = self::convertLocale($base);
     // language switching
-    if(strpos($path, 'setLocale') !== false) {
+    if(strpos($path, 'setLocale') !== false && $_GET['source']) {
       // if index.php
       $replacePartUrl = explode("/", trim($_GET['source'],"/"))[2];
       $url = str_replace('/' . $replacePartUrl . '/', '/' . $localePartUrl . '/', $url);
