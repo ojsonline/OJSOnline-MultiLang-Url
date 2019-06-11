@@ -4,6 +4,15 @@ class MlurlPlugin extends GenericPlugin {
   function register($category, $path, $mainContextId = null) {
     $success = parent::register($category, $path, $mainContextId);
     if ($success && $this->getEnabled($mainContextId)) {
+      // static page integration
+      // needle to load first
+      if(class_exists('StaticPagesPlugin')) {
+        import("plugins.generic.staticPages.StaticPagesPlugin");
+        $staticPages = new StaticPagesPlugin();
+        if($staticPages->getEnabled(null)) {
+          HookRegistry::register('LoadHandler', array(&$this, 'handleStaticPages'));
+        }
+      }
       // router
       HookRegistry::register('LoadHandler', array($this, 'handleLocales'));
       // filters
@@ -27,11 +36,45 @@ class MlurlPlugin extends GenericPlugin {
     return $this->getPluginPath() . DIRECTORY_SEPARATOR . 'pages';
   }
 
+  function isStaticPage($page) {
+    $staticPagesDao = DAORegistry::getDAO('StaticPagesDAO');
+    if(isset($staticPagesDao)) {
+      $request = Application::getRequest();
+      $context = $request->getContext();
+      $staticPage = $staticPagesDao->getByPath(
+        $context?$context->getId():CONTEXT_ID_NONE,
+        $page
+      );
+      return $staticPage;
+    } else {
+      return false;
+    }
+    return false;
+  }
+
+  function handleStaticPages($hookName, $args) {
+    $page =& $args[0];
+    $op =& $args[1];
+    $path =& $args[2];
+    // get static page by path
+    $staticPage = $this->isStaticPage($op);
+    if($staticPage) {
+      $page = $op;
+      $op = 'index';
+      define('HANDLER_CLASS', 'MlurlStaticPagesHandler');
+      $this->import("pages.static.StaticPagesHandler");
+      StaticPagesHandler::setPage($staticPage);
+      return true;
+    }
+
+    return false;
+  }
+
   function handleTemplateDisplay($hookName, $args) {
 
     $templateMgr =& $args[0];
     $template =& $args[1];
-    $request = PKPApplication::getRequest();
+    $request = Application::getRequest();
 
     $templateMgr->registerFilter("output", array($this, 'languageUrlFilter'));
 
@@ -84,7 +127,12 @@ class MlurlPlugin extends GenericPlugin {
             default:  if(is_file("pages/{$page}/index.php")) {
                         require_once("pages/{$page}/index.php");
                       } else {
-                        require_once("pages/{$op}/index.php");
+                        if(is_file("pages/{$op}/index.php")) {
+                          require_once("pages/{$op}/index.php");
+                        } else {
+                          return false;
+                        }
+
                       }
             break;
           }
@@ -224,10 +272,6 @@ class MlurlPlugin extends GenericPlugin {
       break;
     }
     return $page;
-  }
-
-  function opFilter($page, $op) {
-
   }
 
 }
