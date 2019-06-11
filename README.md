@@ -3,6 +3,14 @@
 OJS plugin for Open Journal System (http://pkp.sfu.ca/ojs).
 Adds the selected language in the URL for indexing by the search engines journal pages in different languages.
 
+# DEMO
+
+Before: http://demo.ojsonline.com/index.php/ojsonlinejournal/article/view/5
+
+After in English: http://demo.ojsonline.com/index.php/ojsonlinejournal/en/article/view/5
+After in Russian: http://demo.ojsonline.com/index.php/ojsonlinejournal/ru/article/view/5
+After in Ukraine: http://demo.ojsonline.com/index.php/ojsonlinejournal/ua/article/view/5
+Wow! :)
 
 # License
 
