@@ -8,6 +8,9 @@ Adds the selected language in the URL for indexing by the search engines journal
 
 This plugin is licensed under the GNU General Public License v2. See the file COPYING for the complete terms of this license.
 
+# OJSOnline
+
+For more plugins please visit our web-site: http://ojsonline.com
 
 
 # System Requirements
@@ -28,8 +31,7 @@ Open Journal System >= 3.1.2
 
 ## Bug tracker
 
-Have a bug or a feature request? [Please open a new issue](https://github.com/ojsonline/OJSOnline-MultiLang-Url/issues). Before opening any issue, please search for existing issues and read the [Issue Guidelines](https://github.com/necolas/issue-guidelines), written by [Nicolas Gallagher](https://github.com/necolas/).
-
+Have a bug or a feature request? [Please open a new issue](https://github.com/ojsonline/OJSOnline-MultiLang-Url/issues).
 
 
 ## Author
