@@ -1,4 +1,4 @@
-# OJSOnline-MultiLanf-Url
+# OJSOnline-MultiLang-Url
 
 OJS plugin for Open Journal System (http://pkp.sfu.ca/ojs).
 Adds the selected language in the URL for indexing by the search engines journal pages in different languages.
