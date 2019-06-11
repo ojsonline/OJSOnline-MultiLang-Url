@@ -25,11 +25,11 @@ class MlurlPlugin extends GenericPlugin {
   }
 
   function getDisplayName() {
-    return "Multilingual Url Plugin";
+    return __('plugins.generic.mlurl.displayName');
   }
 
   function getDescription() {
-    return "Multilingual Url Plugin";
+    return __('plugins.generic.mlurl.description');
   }
 
   function getHandlerPath() {

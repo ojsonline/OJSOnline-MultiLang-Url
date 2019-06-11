@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE locale SYSTEM "../../../../../lib/pkp/dtd/locale.dtd">
+<locale name="ru_RU" full_name="Русский">
+	<message key="plugins.generic.mlurl.displayName">Модуль "OJSOnline - Мультиязычная URL"</message>
+	<message key="plugins.generic.mlurl.description">Добавляет выбранный язык журнала в URL для индексации поисковыми системами страниц журнала на разных языках</message>
+</locale>
