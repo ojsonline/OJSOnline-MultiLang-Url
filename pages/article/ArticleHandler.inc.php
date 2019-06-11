@@ -10,6 +10,11 @@ class MlurlArticleHandler extends ArticleHandler {
   function view($args, $request) {
     unset($args[0]);
     $args = array_values($args);
+    $request->getRouter()->_page = 'article';
+    $request->getRouter()->_op = 'view';
+    $galleyDao = DAORegistry::getDAO('ArticleGalleyDAO');
+    $galley = $galleyDao->getByBestGalleyId($args[1], $args[0]);
+    $this->galley = $galley;
     parent::view($args, $request);
   }
   function download($args, $request) {
