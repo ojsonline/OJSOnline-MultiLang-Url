@@ -209,9 +209,24 @@ class MlurlPlugin extends GenericPlugin {
     $localePartUrl = self::convertLocale($base);
     // language switching
     if(strpos($path, 'setLocale') !== false && $_GET['source']) {
-      // if index.php
-      $replacePartUrl = explode("/", trim($_GET['source'],"/"))[2];
-      $url = str_replace('/' . $replacePartUrl . '/', '/' . $localePartUrl . '/', $url);
+      // delete index php in url part
+      $index_php = false;
+      $url_parts = explode("/", trim($_GET['source'],"/"));
+      if(in_array('index.php', $url_parts)) {
+        $key = array_search('index.php', $url_parts);
+        $index_php = true;
+        unset($url_parts[$key]);
+      }
+      $url_parts = array_values($url_parts);
+      $replacePartUrl = $url_parts[1];
+
+      $url_parts[1] = $localePartUrl;
+
+      if($index_php) {
+        $url = $request->getBaseUrl() . "/index.php/" . implode("/", $url_parts);
+      } else {
+        $url = $request->getBaseUrl() . "/" . implode("/", $url_parts);
+      }
       // fix
       if(substr($url, -1) != '/') {
         $url .= '/';
