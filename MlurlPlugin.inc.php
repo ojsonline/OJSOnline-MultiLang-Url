@@ -91,6 +91,7 @@ class MlurlPlugin extends GenericPlugin {
 
     if($this->getEnabled()) {
       $request = Application::getRequest();
+      $session = $request->getSession();
       if(in_array($page, $urlLocales)) {
           // flip page and op
           $url_parts = array_filter(explode("/", parse_url($request->getCompleteUrl())['path']));
@@ -112,7 +113,6 @@ class MlurlPlugin extends GenericPlugin {
           // some pages can have other path
           $page = $this->pageFilter($page);
           // rewrite locale in session
-          $session = $request->getSession();
           $currentLocale = $session->getSessionVar('currentLocale');
           if($currentLocale != $pageLocale) {
             $session->setSessionVar('currentLocale', $pageLocale);
@@ -141,7 +141,8 @@ class MlurlPlugin extends GenericPlugin {
           return true;
       } else {
         if(!$page && $op == 'index') {
-          $currentLocale = self::convertLocale(AppLocale::getPrimaryLocale());
+          $currentLocale = self::convertLocale($session->getSessionVar('currentLocale'));
+          if(!$currentLocale) $currentLocale = self::convertLocale(AppLocale::getPrimaryLocale());
           $request->redirectUrl(trim($request->getCompleteUrl(), "/") . "/" . $currentLocale);
         }
       }
@@ -181,7 +182,7 @@ class MlurlPlugin extends GenericPlugin {
          && strpos($href, $baseUrl . '/manageIssues') === false
          && strpos($href, $baseUrl . '/$$$call$$$') === false
        ) {
-              $pqLink->attr('href', str_replace(array($baseUrl . "/", $indexUrl), $baseUrl . "/" . $currentLocale . '/', $href));
+              $pqLink->attr('href', trim(preg_replace('/\s+/', ' ', str_replace(array($baseUrl . "/", $indexUrl), $baseUrl . "/" . $currentLocale . '/', $href))));
       } else {
         // issue fix
         if(strpos($currentUrl, 'issue') !== false && strpos($href, 'issue') === false && strpos($href, 'view') !== false) {
