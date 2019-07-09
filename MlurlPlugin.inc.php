@@ -90,16 +90,17 @@ class MlurlPlugin extends GenericPlugin {
     $pageLocale = self::convertLocale($page,true);
 
     if($this->getEnabled()) {
+      $request = Application::getRequest();
       if(in_array($page, $urlLocales)) {
-          $request = Application::getRequest();
-
           // flip page and op
           $url_parts = array_filter(explode("/", parse_url($request->getCompleteUrl())['path']));
+          // delete index php in url part
           if(in_array('index.php', $url_parts)) {
             $key = array_search('index.php', $url_parts);
             unset($url_parts[$key]);
           }
           $url_parts = array_values($url_parts);
+          // set page and op by url parts
           if(isset($url_parts[2])) {
             $page = $url_parts[2];
           }
@@ -138,6 +139,11 @@ class MlurlPlugin extends GenericPlugin {
           }
 
           return true;
+      } else {
+        if(!$page && $op == 'index') {
+          $currentLocale = self::convertLocale(AppLocale::getPrimaryLocale());
+          $request->redirectUrl(trim($request->getCompleteUrl(), "/") . "/" . $currentLocale);
+        }
       }
     }
 
@@ -266,11 +272,6 @@ class MlurlPlugin extends GenericPlugin {
   }
 
   function pageFilter($page) {
-    switch(strtolower($page)) {
-      case 'wizard' :
-      case 'submissions' : $page = 'submission';
-      break;
-    }
     return $page;
   }
 
