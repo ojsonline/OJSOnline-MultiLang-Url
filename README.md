@@ -4,7 +4,8 @@ OJS plugin for Open Journal System (http://pkp.sfu.ca/ojs).
 Adds the selected language in the URL for indexing by the search engines journal pages in different languages.
 
 # DOWNLOAD RELEASE
-1.0.0. from 11.06.2019 https://github.com/ojsonline/OJSOnline-MultiLang-Url/releases
+1.0.1. from 16.07.2019 https://github.com/ojsonline/OJSOnline-MultiLang-Url/releases/tag/1.0.1
+1.0.0. from 11.06.2019 https://github.com/ojsonline/OJSOnline-MultiLang-Url/releases/tag/1.0.0
 
 # DEMO
 
